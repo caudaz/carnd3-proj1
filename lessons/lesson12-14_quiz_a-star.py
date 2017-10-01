@@ -10,7 +10,8 @@ heuristic = [[9, 8, 7, 6, 5, 4],
              [7, 6, 5, 4, 3, 2],
              [6, 5, 4, 3, 2, 1],
              [5, 4, 3, 2, 1, 0]]
-heuristic_old = [[0 for col in range(len(grid[0]))] for row in range(len(grid))]
+# heuristic function (switch to Zeros and is no longer A* search)
+# heuristic = [[0 for col in range(len(grid[0]))] for row in range(len(grid))]
 
 init = [0, 0]
 goal = [len(grid)-1, len(grid[0])-1]
