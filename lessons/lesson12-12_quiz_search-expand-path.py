@@ -1,20 +1,3 @@
-# ----------
-# User Instructions:
-# 
-# Define a function, search() that returns a list
-# in the form of [optimal path length, row, col]. For
-# the grid shown below, your function should output
-# [11, 4, 5].
-#
-# If there is no valid path from the start point
-# to the goal, your function should return the string
-# 'fail'
-# ----------
-
-# Grid format:
-#   0 = Navigable space
-#   1 = Occupied space
-
 grid = [[0, 0, 1, 0, 0, 0],
         [0, 0, 1, 0, 0, 0],
         [0, 0, 0, 0, 1, 0],
