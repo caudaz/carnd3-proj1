@@ -63,9 +63,15 @@ def search(grid,init,goal,cost,heuristic):
             resign = True
             return "Fail"
         else:
+            # remove nodes from list
+            print('open before sort',open)
             open.sort()
+            print('open after sort',open)
             open.reverse()
-            next = open.pop()
+            print('open after reverse',open)
+            next = open.pop() # finds the one with the smalles g-value to be expanded
+            print('open after next=open.pop()',open)
+            print('next',next)
             x = next[3]
             y = next[4]
             g = next[1]
@@ -80,17 +86,42 @@ def search(grid,init,goal,cost,heuristic):
                     y2 = y + delta[i][1]
                     if x2 >= 0 and x2 < len(grid) and y2 >=0 and y2 < len(grid[0]):
                         if closed[x2][y2] == 0 and grid[x2][y2] == 0:
+                            print('open before append',open)
                             g2 = g + cost
                             h2 = heuristic[x2][y2]
                             f2 = g2 + h2
+                            print('append list item', [f2, g2, h2, x2, y2])
                             open.append([f2, g2, h2, x2, y2])
+                            print('open after append',open)
+                            # close x2 y2 so that it cannot be expanded/search again
                             closed[x2][y2] = 1
-
-    print('')
+                            # path
+                            action[x2][y2] = i # memorize the action it took to get there
+            print('')
+               
     print('EXPANSION COUNT')                        
     for i in range(len(expand)):
-        print(expand[i])
-
+        print(expand[i])        
+    print('')
+    
+    print('ACTION (up,left,down,right)')                        
+    for i in range(len(action)):
+        print(action[i])
+    print('')
+    
+    policy = [[' ' for col in range(len(grid[0]))] for row in range(len(grid))]
+    x = goal[0]
+    y = goal[1]
+    policy[x][y] = '*' # goal location
+    while x != init[0] or y != init[1]:
+         x2 = x - delta[action[x][y]][0]
+         y2 = y - delta[action[x][y]][1]
+         policy[x2][y2] = delta_name[action[x][y]]
+         x = x2
+         y = y2                           
+    print('PATH')                        
+    for i in range(len(policy)):
+        print(policy[i])
 
     return
 

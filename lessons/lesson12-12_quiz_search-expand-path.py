@@ -96,23 +96,22 @@ def search(grid,init,goal,cost):
                         if closed[x2][y2] == 0 and grid[x2][y2] == 0:
                             print('open before append',open)
                             g2 = g + cost
-                            print('append list item')
-                            print([g2, x2, y2])
+                            print('append list item',[g2, x2, y2])
                             open.append([g2, x2, y2])
                             print('open after append',open)
-                            print('')
                             # check the coordinate x2 y2 so that I never expand it again 
                             closed[x2][y2] = 1  
                             # path
                             action[x2][y2] = i # memorize the action it took to get there
-                            
+            print('')
+            
     print('')
-    print('EXPANSION COUNT')                        
+    print('EXPANSION COUNT (order in which "next" x,y,g were chosen')                        
     for i in range(len(expand)):
         print(expand[i])
 
     print('')
-    print('ACTION')                        
+    print('ACTION (up,left,down,right)')                        
     for i in range(len(action)):
         print(action[i])
 
@@ -125,8 +124,7 @@ def search(grid,init,goal,cost):
          y2 = y - delta[action[x][y]][1]
          policy[x2][y2] = delta_name[action[x][y]]
          x = x2
-         y = y2
-                            
+         y = y2                           
     print('')
     print('PATH')                        
     for i in range(len(policy)):

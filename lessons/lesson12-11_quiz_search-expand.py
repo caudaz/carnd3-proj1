@@ -72,6 +72,7 @@ def search(grid,init,goal,cost):
             next = open.pop() # finds the one with the smalles g-value to be expanded
             print('open after next=open.pop()',open)
             print('next',next)
+            print('')
             x = next[1]
             y = next[2]
             g = next[0]
@@ -95,15 +96,14 @@ def search(grid,init,goal,cost):
                         if closed[x2][y2] == 0 and grid[x2][y2] == 0:
                             print('open before append',open)
                             g2 = g + cost
-                            print('append list item')
-                            print([g2, x2, y2])
+                            print('append list item',[g2, x2, y2])
                             open.append([g2, x2, y2])
                             print('open after append',open)
-                            print('')
                             # check the coordinate x2 y2 so that I never expand it again 
                             closed[x2][y2] = 1   
+            print('')
     print('')
-    print('EXPANSION COUNT')                        
+    print('EXPANSION COUNT (order in which x,y,g "next" were chosen)')                        
     for i in range(len(expand)):
         print(expand[i])
     
