@@ -66,13 +66,16 @@ def optimum_policy2D(grid,init,goal,cost):
     # 2d grid (x, y)    
     policy2D = [[' ' for row in range(len(grid[0]))] for col in range(len(grid))]    
     
-    change = True    
+    change = True 
+    
     while change:       
-        change = False        
+        change = False  
+        
         # go thru all grids and calculate values (all X's, Y's and 4 orientations)
         for x in range(len(grid)):
             for y in range(len(grid[0])):
                 for orientation in range(4):
+                    
                     # if goal location found update value
                     if goal[0] == x and goal[1] == y:
                         if value[orientation][x][y] > 0:
@@ -81,6 +84,7 @@ def optimum_policy2D(grid,init,goal,cost):
                             value[orientation][x][y] = 0
                             # mark location with an asterisk
                             policy[orientation][x][y] = '*'
+                            
                     # navigable space in grid (not an obstacle)
                     elif grid[x][y] == 0:
                         # calculate the 3 ways to propagate value
@@ -125,8 +129,6 @@ def optimum_policy2D(grid,init,goal,cost):
     for i in range(len(policy2D)):
         print(policy2D[i])
 
-        
     return policy2D
-
 
 optimum_policy2D(grid,init,goal,cost)
