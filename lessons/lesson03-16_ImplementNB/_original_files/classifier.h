@@ -11,9 +11,8 @@ using namespace std;
 class GNB {
 public:
 
-	double means[3][4], vars[3][4];
-
 	vector<string> possible_labels = {"left","keep","right"};
+
 
 	/**
   	* Constructor
