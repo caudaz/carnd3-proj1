@@ -1,0 +1,3 @@
+/mnt/c/UDACITY3/carnd3-proj1/build/CMakeFiles/edit_cache.dir
+/mnt/c/UDACITY3/carnd3-proj1/build/CMakeFiles/rebuild_cache.dir
+/mnt/c/UDACITY3/carnd3-proj1/build/CMakeFiles/path_planning.dir

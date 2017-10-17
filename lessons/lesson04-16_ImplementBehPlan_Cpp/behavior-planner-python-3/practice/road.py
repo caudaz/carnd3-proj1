@@ -22,7 +22,7 @@ class Road(object):
     for l in range(self.num_lanes):
       lane_speed = self.lane_speeds[l]
       vehicle_just_added = False
-      for s in range(start_s, start_s + self.update_width):
+      for s in range(int(start_s), int(start_s + self.update_width)):
         if vehicle_just_added:
           vehicle_just_added = False
           continue
