@@ -4,17 +4,30 @@ from cost_functions import *
 from constants import *
 
 # TODO - tweak weights to existing cost functions
+#WEIGHTED_COST_FUNCTIONS = [
+#    (time_diff_cost,    1),
+#    (s_diff_cost,       1),
+#    (d_diff_cost,       1),
+#    (efficiency_cost,   1),
+#    (max_jerk_cost,     1),
+#    (total_jerk_cost,   1),
+#    (collision_cost,    1),
+#    (buffer_cost,       1),
+#    (max_accel_cost,    1),
+#    (total_accel_cost,  1),
+#]
+
 WEIGHTED_COST_FUNCTIONS = [
     (time_diff_cost,    1),
-    (s_diff_cost,       1),
-    (d_diff_cost,       1),
+    (s_diff_cost,       10.00),
+    (d_diff_cost,       20.00),
     (efficiency_cost,   1),
     (max_jerk_cost,     1),
     (total_jerk_cost,   1),
-    (collision_cost,    1),
-    (buffer_cost,       1),
+    (collision_cost,    10.00),
+    (buffer_cost,       10),
     (max_accel_cost,    1),
-    (total_accel_cost,  1),
+    (total_accel_cost,  1)
 ]
 
 def PTG(start_s, start_d, target_vehicle, delta, T, predictions):
