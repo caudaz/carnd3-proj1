@@ -835,6 +835,8 @@ math.h
 -
 uWS/uWS.h
 -
+ctime
+-
 chrono
 -
 iostream
@@ -849,4 +851,16 @@ Eigen-3.3/Eigen/QR
 /mnt/c/UDACITY3/carnd3-proj1/src/Eigen-3.3/Eigen/QR
 json.hpp
 /mnt/c/UDACITY3/carnd3-proj1/src/json.hpp
+spline.h
+/mnt/c/UDACITY3/carnd3-proj1/src/spline.h
+
+/mnt/c/UDACITY3/carnd3-proj1/src/spline.h
+cstdio
+-
+cassert
+-
+vector
+-
+algorithm
+-
 
