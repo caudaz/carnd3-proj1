@@ -163,9 +163,9 @@ vector<double> getXY(double s, double d, const vector<double> &maps_s, const vec
 
 float distFromVelTimeSpp(double s, double vel_x, double vel_y, double dt, int spp)
 {
-					double speed = sqrt(vel_x * vel_x + vel_y * vel_y);
-					double pred_s = s + (double)spp * speed * dt;	
-					return pred_s;
+                    double speed = sqrt(vel_x * vel_x + vel_y * vel_y);
+                    double pred_s = s + (double)spp * speed * dt;   
+                    return pred_s;
 }
 
 // initial values needed outside the main loop
@@ -247,22 +247,22 @@ int main() {
 
             // Sensor Fusion Data, a list of all other cars on the same side of the road.
             auto sensor_fusion = j[1]["sensor_fusion"];
-			
-			///////////////////////////////
+            
+            ///////////////////////////////
             // 0 - INITIAL VALUES IN LOOP//
-			///////////////////////////////
+            ///////////////////////////////
             double desired_speed_mph = 49.3; // less than 50mph to not violate the speed limit transiently
-			
-			/////////////////////////////////////////////////////////////////
+            
+            /////////////////////////////////////////////////////////////////
             // 1 - PREDICT S, SPEED AT THE END OF THE RETURNED UNUSED PATH //
-			/////////////////////////////////////////////////////////////////            
+            /////////////////////////////////////////////////////////////////            
             int spp = previous_path_x.size();
             double sensor_car_x = car_x;
             double sensor_car_y = car_y;
             double sensor_car_yaw = deg2rad(car_yaw);            
             if (2 <= spp)
             {
-				// use the last 2 points in the path to "predict" yaw and speed
+                // use the last 2 points in the path to "predict" yaw and speed
                 sensor_car_x = previous_path_x[spp-1];
                 sensor_car_y = previous_path_y[spp-1];
                 double sensor_car_x_prev = previous_path_x[spp-2];
@@ -270,114 +270,114 @@ int main() {
                 sensor_car_yaw = atan2(sensor_car_y - sensor_car_y_prev, sensor_car_x - sensor_car_x_prev);
                 car_speed = (sqrt((sensor_car_x-sensor_car_x_prev) * (sensor_car_x-sensor_car_x_prev)+
                                   (sensor_car_y-sensor_car_y_prev) * (sensor_car_y-sensor_car_y_prev)) / .02) * 2.23694;
-				// "predict" s
-				car_s = end_path_s;
+                // "predict" s
+                car_s = end_path_s;
             }
-						
-			///////////////////////
+                        
+            ///////////////////////
             // 2 - FINITE STATES //
-			///////////////////////           
+            ///////////////////////           
             double min_dist_s = 99999999.9;
-			double car_front_speed;
+            double car_front_speed;
             bool switch_lane = false;
-			bool car_front_exists = false;
-			
-			// search thru other cars from sensor fusion
+            bool car_front_exists = false;
+            
+            // search thru other cars from sensor fusion
             for (int i = 0; i < sensor_fusion.size(); i++)
             {
-				// if in my lane
-				if (  4*car_lane < sensor_fusion[i][6] && sensor_fusion[i][6] < (4 * car_lane + 4) )
-				{
-					// predict other car s
+                // if in my lane
+                if (  4*car_lane < sensor_fusion[i][6] && sensor_fusion[i][6] < (4 * car_lane + 4) )
+                {
+                    // predict other car s
                     double sensed_car_speed = sqrt((double)sensor_fusion[i][3] * (double)sensor_fusion[i][3] + 
-												   (double)sensor_fusion[i][4] * (double)sensor_fusion[i][4]);
+                                                   (double)sensor_fusion[i][4] * (double)sensor_fusion[i][4]);
                     double sensed_car_s = (double)sensor_fusion[i][5] + (double)spp * sensed_car_speed * 0.02;
-					double dist_s = sensed_car_s - car_s;
-					// find closest car in front
-					if (car_s < sensed_car_s && dist_s < min_dist_s) 
-					{			
-						car_front_exists = true;
-						min_dist_s = dist_s;
-						car_front_speed = sensed_car_speed;
-					}
-				}			
-			}
+                    double dist_s = sensed_car_s - car_s;
+                    // find closest car in front
+                    if (car_s < sensed_car_s && dist_s < min_dist_s) 
+                    {           
+                        car_front_exists = true;
+                        min_dist_s = dist_s;
+                        car_front_speed = sensed_car_speed;
+                    }
+                }           
+            }
 
-			// STATE - car in front => switch lane
-			if (car_front_exists && min_dist_s < 25.0)
-			{
-				double min_spd = car_front_speed * 2.23694 - 3.5;
-				double max_spd = car_front_speed * 2.23694;
-				if (min_dist_s < +25.0) desired_speed_mph = min_spd + (max_spd - min_spd)/(25.0 - 12.5)*(min_dist_s - 12.5);
-				if (min_dist_s < +12.5) desired_speed_mph = min_spd;
-				switch_lane = true;
-			}
-			// STATE - no car in front => cruise
-			if (!car_front_exists)
-			{
-				desired_speed_mph = desired_speed_mph;
-				switch_lane = false ;
-			}	
-			// STATE - on left most lane => switch lane
-			if (car_lane ==0 && (t_start_left_lane + 7 < time(nullptr)) )
-			{
-				desired_speed_mph = desired_speed_mph;
-				switch_lane = true;
-			}
-			
-			if (debug) cout<<" car_front_exists="<<car_front_exists << " min_dist_s="<<min_dist_s<<" car_lane="<<car_lane<<" switch_lane="<<switch_lane<<endl;
-			
-			//////////////////////////////////////
+            // STATE - car in front => switch lane
+            if (car_front_exists && min_dist_s < 25.0)
+            {
+                double min_spd = car_front_speed * 2.23694 - 3.5;
+                double max_spd = car_front_speed * 2.23694;
+                if (min_dist_s < +25.0) desired_speed_mph = min_spd + (max_spd - min_spd)/(25.0 - 12.5)*(min_dist_s - 12.5);
+                if (min_dist_s < +12.5) desired_speed_mph = min_spd;
+                switch_lane = true;
+            }
+            // STATE - no car in front => cruise
+            if (!car_front_exists)
+            {
+                desired_speed_mph = desired_speed_mph;
+                switch_lane = false ;
+            }   
+            // STATE - on left most lane => switch lane
+            if (car_lane ==0 && (t_start_left_lane + 7 < time(nullptr)) )
+            {
+                desired_speed_mph = desired_speed_mph;
+                switch_lane = true;
+            }
+            
+            if (debug) cout<<" car_front_exists="<<car_front_exists << " min_dist_s="<<min_dist_s<<" car_lane="<<car_lane<<" switch_lane="<<switch_lane<<endl;
+            
+            //////////////////////////////////////
             // 3 - SAFETY CHECK FOR SWITCH LANE //
-			//////////////////////////////////////
+            //////////////////////////////////////
 
-			// if state is to switch lane and 3 secs have passed since last switch lane
+            // if state is to switch lane and 3 secs have passed since last switch lane
             if (switch_lane  &&  3 < time(nullptr) - t_switch_lane)
             {
-				bool safety_left;
-				bool safety_right;
-				if (car_lane == 0) safety_left  = false; else safety_left  = true; 
-				if (car_lane == 2) safety_right = false; else safety_right = true; 
-				// search thru other cars from sensor fusion 
-				for (int i = 0; i < sensor_fusion.size(); i++)
-				{
-					// predict other car s
+                bool safety_left;
+                bool safety_right;
+                if (car_lane == 0) safety_left  = false; else safety_left  = true; 
+                if (car_lane == 2) safety_right = false; else safety_right = true; 
+                // search thru other cars from sensor fusion 
+                for (int i = 0; i < sensor_fusion.size(); i++)
+                {
+                    // predict other car s
                     double sensed_car_speed = sqrt((double)sensor_fusion[i][3] * (double)sensor_fusion[i][3] + 
-												   (double)sensor_fusion[i][4] * (double)sensor_fusion[i][4]);
+                                                   (double)sensor_fusion[i][4] * (double)sensor_fusion[i][4]);
                     double sensed_car_s = (double)sensor_fusion[i][5] + (double)spp * sensed_car_speed * 0.02;
-					float  sensed_car_d = sensor_fusion[i][6];
-					double dist_s = sensed_car_s - car_s;
-					// range of unsafe distance to closest cars
-					if(-18.0 < dist_s && dist_s < +22.0)
-					{
-						// if on adjacent lanes and on distance range => unsafe to switch lanes
-						if (car_lane != 0 && 4 * car_lane - 4 < sensed_car_d && sensed_car_d < 4 * car_lane)     safety_left  = false;
-						if (car_lane != 2 && 4 * car_lane + 4 < sensed_car_d && sensed_car_d < 4 * car_lane + 8) safety_right = false;
-					} 
-				}
-				// if safe to switch lanes:
-				// substract/add to lane to determine new lane
-				// start time counters
-				if (safety_left)
-				{
-					car_lane = car_lane - 1;
-					t_switch_lane = time(nullptr);
-					if (car_lane == 0) t_start_left_lane = time(nullptr);
-				}
-				if (!safety_left && safety_right)
-				{
-					car_lane = car_lane + 1;
-					t_switch_lane = time(nullptr);
-				}
-			if (debug) cout<<"\t\t\t\t\t\t\t\t safety_left="<<safety_left<<" safety_right="<<safety_right<<endl;
+                    float  sensed_car_d = sensor_fusion[i][6];
+                    double dist_s = sensed_car_s - car_s;
+                    // range of unsafe distance to closest cars
+                    if(-18.0 < dist_s && dist_s < +22.0)
+                    {
+                        // if on adjacent lanes and on distance range => unsafe to switch lanes
+                        if (car_lane != 0 && 4 * car_lane - 4 < sensed_car_d && sensed_car_d < 4 * car_lane)     safety_left  = false;
+                        if (car_lane != 2 && 4 * car_lane + 4 < sensed_car_d && sensed_car_d < 4 * car_lane + 8) safety_right = false;
+                    } 
+                }
+                // if safe to switch lanes:
+                // substract/add to lane to determine new lane
+                // start time counters
+                if (safety_left)
+                {
+                    car_lane = car_lane - 1;
+                    t_switch_lane = time(nullptr);
+                    if (car_lane == 0) t_start_left_lane = time(nullptr);
+                }
+                if (!safety_left && safety_right)
+                {
+                    car_lane = car_lane + 1;
+                    t_switch_lane = time(nullptr);
+                }
+            if (debug) cout<<"\t\t\t\t\t\t\t\t safety_left="<<safety_left<<" safety_right="<<safety_right<<endl;
             }
-			
-			
-			///////////////////////////////
+            
+            
+            ///////////////////////////////
             // 4 - TRAJECTORY GENERATION //
-			///////////////////////////////
+            ///////////////////////////////
 
-			// using the current car_lane and s compute 3 XY locations at 27m, 54m, and 81m
+            // using the current car_lane and s compute 3 XY locations at 27m, 54m, and 81m
             vector<double> sXY27m = getXY(car_s + 27, 2 + 4 * car_lane, map_waypoints_s, map_waypoints_x, map_waypoints_y);
             vector<double> sXY54m = getXY(car_s + 54, 2 + 4 * car_lane, map_waypoints_s, map_waypoints_x, map_waypoints_y);
             vector<double> sXY81m = getXY(car_s + 81, 2 + 4 * car_lane, map_waypoints_s, map_waypoints_x, map_waypoints_y);
@@ -385,66 +385,66 @@ int main() {
             // create X and Y vectors for using the last 2 unused points on path + 3 sXY points
             vector<double> path_x;
             vector<double> path_y;
-			double car_speed_tmp;
+            double car_speed_tmp;
             if (2 <= spp)
             {
-				path_x = {previous_path_x[spp-2], previous_path_x[spp-1], sXY27m[0], sXY54m[0], sXY81m[0]};
-				path_y = {previous_path_y[spp-2], previous_path_y[spp-1], sXY27m[1], sXY54m[1], sXY81m[1]};
-			}
-			else
-			{
-				if (car_speed < 0.1) car_speed_tmp = 0.1;
-				else 			     car_speed_tmp = car_speed;
-				// transform w.r.t car C.S.
-				path_x = {car_x - car_speed_tmp * 0.02 * cos(car_yaw), car_x, sXY27m[0], sXY54m[0], sXY81m[0]};
-				path_y = {car_y - car_speed_tmp * 0.02 * sin(car_yaw), car_y, sXY27m[1], sXY54m[1], sXY81m[1]};				
-			}
+                path_x = {previous_path_x[spp-2], previous_path_x[spp-1], sXY27m[0], sXY54m[0], sXY81m[0]};
+                path_y = {previous_path_y[spp-2], previous_path_y[spp-1], sXY27m[1], sXY54m[1], sXY81m[1]};
+            }
+            else
+            {
+                if (car_speed < 0.1) car_speed_tmp = 0.1;
+                else                 car_speed_tmp = car_speed;
+                // transform w.r.t car C.S.
+                path_x = {car_x - car_speed_tmp * 0.02 * cos(car_yaw), car_x, sXY27m[0], sXY54m[0], sXY81m[0]};
+                path_y = {car_y - car_speed_tmp * 0.02 * sin(car_yaw), car_y, sXY27m[1], sXY54m[1], sXY81m[1]};             
+            }
             for (int i = 0; i < path_x.size(); i++ )
             {
                 double x_wrt_sensor = path_x[i] - sensor_car_x;
                 double y_wrt_sensor = path_y[i] - sensor_car_y;
-				// transform w.r.t car C.S.
+                // transform w.r.t car C.S.
                 path_x[i] = x_wrt_sensor * cos(-sensor_car_yaw) - y_wrt_sensor * sin(-sensor_car_yaw);
                 path_y[i] = x_wrt_sensor * sin(-sensor_car_yaw) + y_wrt_sensor * cos(-sensor_car_yaw);
             }
             
-			// create spline
+            // create spline
             tk::spline s;
             s.set_points(path_x,path_y);
             double s_x = 27.0;
-			// find the value of Y at 27m on spline (w.r.t car C.S.)
+            // find the value of Y at 27m on spline (w.r.t car C.S.)
             double s_y = s(s_x);
-			// approximate length of spline by linearizing it
+            // approximate length of spline by linearizing it
             double s_dist = sqrt(s_x * s_x + s_y * s_y);
             double x_point_prev = 0;
 
-			// initialize next_ vector to be sent to simulator
-			// use unused path if exists
+            // initialize next_ vector to be sent to simulator
+            // use unused path if exists
             vector<double> next_x_vals, next_y_vals;
             for(int i = 0; i < previous_path_x.size(); i++)
             {
                 next_x_vals.push_back(previous_path_x[i]);
                 next_y_vals.push_back(previous_path_y[i]);
-            }			
-			// add remaining points to total of 50 using spline
+            }           
+            // add remaining points to total of 50 using spline
             for (int i = 1; i <= 50 - previous_path_x.size(); i++) 
             {
-				// increase/decrease speed according to state
+                // increase/decrease speed according to state
                 if(desired_speed_mph > car_speed)      car_speed = car_speed + 0.20;
                 else if(desired_speed_mph < car_speed) car_speed = car_speed - 0.20;
-				// divide S by traveled distance every 0.02sec
+                // divide S by traveled distance every 0.02sec
                 double N_points_on_S = s_dist / (.02 * car_speed / 2.23694);
-				// compute x linearized
+                // compute x linearized
                 double x_point = x_point_prev + s_x / N_points_on_S;
-				// get spline value for x
+                // get spline value for x
                 double y_point = s(x_point);
                 x_point_prev = x_point;
-				// transform w.r.t global C.S.
+                // transform w.r.t global C.S.
                 double x_point_tmp = x_point;
                 double y_point_tmp = y_point;
                 x_point = (x_point_tmp * cos(sensor_car_yaw) - y_point_tmp * sin(sensor_car_yaw)) + sensor_car_x;
                 y_point = (x_point_tmp * sin(sensor_car_yaw) + y_point_tmp * cos(sensor_car_yaw)) + sensor_car_y;
-				// put into next_ vector to be sent to simulator
+                // put into next_ vector to be sent to simulator
                 next_x_vals.push_back(x_point);
                 next_y_vals.push_back(y_point);
             }
